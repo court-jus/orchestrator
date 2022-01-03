@@ -1,0 +1,47 @@
+{
+    "main": {
+        "title": "Main menu",
+        "items": [
+            {
+                "id": "quit",
+                "title": "Quit",
+                "action": "quit"
+            },
+            {
+                "id": "set_root",
+                "title": "Set root note",
+                "action": "uimode",
+                "args": ["set_root"]
+            },
+            {
+                "id": "set_scale",
+                "title": "Set scale",
+                "action": "menu",
+                "args": ["$.scaletype"]
+            }
+        ]
+    },
+    "scaletype": {
+        "title": "Choose scale",
+        "items": [
+            {
+                "id": "main",
+                "title": "Back to main menu",
+                "action": "menu",
+                "args": ["$.main"]
+            },
+            {
+                "id": "major",
+                "title": "Major",
+                "action": "set_scale",
+                "args": ["major"]
+            },
+            {
+                "id": "minor",
+                "title": "Minor",
+                "action": "set_scale",
+                "args": ["minor"]
+            }
+        ]
+    }
+}

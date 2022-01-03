@@ -1,8 +1,10 @@
+from ..core.events import EventListener
 import mido
 
 
-class ChordsEmitter:
-    def __init__(self, scale, output, channel=0):
+class ChordsEmitter(EventListener):
+    def __init__(self, ec, scale, output, channel=0):
+        self.ec = ec
         self.scale = scale
         self.current_notes = []
         self.stopat = None
@@ -11,6 +13,7 @@ class ChordsEmitter:
         self.chord = [0, 2, 4, 7]
         self.output = output
         self.channel = channel
+        super().__init__(ec)
 
     def tick(self, event, step):
         if not self.scale.available_notes:
@@ -31,7 +34,3 @@ class ChordsEmitter:
     def get_notes(self):
         scale_notes = sorted(self.scale.available_notes)
         return [scale_notes[degree] for degree in self.chord]
-
-    def noteon(self, event, msg):
-        self.available_notes.append(msg.note)
-        print(self.available_notes)

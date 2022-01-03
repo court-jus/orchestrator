@@ -1,16 +1,19 @@
+from ..core.events import EventListener
 import random
 import mido
 
 
-class RandomNoteEmitter:
-    def __init__(self, scale, output, channel=0):
+class RandomNoteEmitter(EventListener):
+    def __init__(self, ec, scale, output, channel=0):
+        self.ec = ec
         self.scale = scale
         self.current_note = None
         self.stopat = None
-        self.step_length = 15
+        self.step_length = 150
         self.note_duration = 5
         self.output = output
         self.channel = 0
+        super().__init__(ec)
 
     def tick(self, event, step):
         if not self.scale.available_notes:
