@@ -1,8 +1,5 @@
 import mido
 
-from .clock import Clock
-
-
 
 def get_port(query, direction="output", **kwargs):
     port_lister = mido.get_output_names if direction == "output" else mido.get_input_names
@@ -12,4 +9,4 @@ def get_port(query, direction="output", **kwargs):
         if query.lower() in portname.lower():
             return port_getter(portname, **kwargs)
 
-__all__ = [Clock, get_port]
+__all__ = [get_port, ]
