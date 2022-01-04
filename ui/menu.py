@@ -33,16 +33,28 @@ class Menu(EventListener):
             )
 
     def user_action(self, event, msg):
-        if msg.channel == 0 and msg.control == 4:
-            # Update current selection
-            self.currentselection = min(
-                len(self.actions) - 1, int(msg.value * len(self.actions) / 127)
+        if msg.channel != 15:  # Channels are 0 indexed
+            return
+        if msg.control == 0 and msg.value == 127:
+            # Up arrow
+            self.currentselection = (
+                min(len(self.actions) - 1, self.currentselection + 1)
+                if self.currentselection is not None
+                else 1
+            )
+            self.display()
+        elif msg.control == 1 and msg.value == 127:
+            # Down arrow
+            self.currentselection = (
+                max(0, self.currentselection - 1)
+                if self.currentselection is not None
+                else 0
             )
             self.display()
         elif (
-            msg.channel == 0 and msg.control == 5 and self.currentselection is not None
+            msg.control == 3 and msg.value == 127 and self.currentselection is not None
         ):
-            # Activate current selection
+            # Right arrow
             menuitem = self.actions[self.currentselection]
             if menuitem["action"] == "menu":
                 self.initmenu(menuitem["args"][0])
@@ -53,3 +65,6 @@ class Menu(EventListener):
                     *menuitem.get("args", []),
                     **menuitem.get("kwargs", {}),
                 )
+        elif msg.control == 2 and msg.value == 127:
+            # Emergency quit with left arrow
+            self.ec.publish("quit")
