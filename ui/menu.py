@@ -1,12 +1,14 @@
+import mido
 import json
-from jsonpath_ng import jsonpath, parse
+from jsonpath_ng import parse
 
 from ..core.events import EventListener
 
 
 class Menu(EventListener):
-    def __init__(self, ec):
+    def __init__(self, ec, scale):
         self.ec = ec
+        self.scale = scale
         with open("orchestrator/ui/menu.json", "r") as fp:
             self.menu = json.load(fp)
         self.initmenu("$.main")
@@ -22,11 +24,26 @@ class Menu(EventListener):
     def loadmenu(self):
         self.currentmenu = parse(self.currentmenupath).find(self.menu)[0].value
         self.actions = []
-        for item in self.currentmenu["items"]:
-            self.actions.append(item)
+        if self.currentmenupath != "$.main":
+            # Add a "back to main menu" action
+            self.actions.append(
+                {
+                    "id": "main",
+                    "title": "Back to main menu",
+                    "action": "menu",
+                    "args": ["$.main"],
+                }
+            )
+        menuitems = self.currentmenu["items"]
+        if isinstance(menuitems, str) and hasattr(self, menuitems):
+            self.actions.extend(getattr(self, menuitems)())
+        elif isinstance(menuitems, (tuple, list)):
+            for item in menuitems:
+                self.actions.append(item)
 
-    def display(self):
+    def display(self, _event=None, _msg=None):
         print(f"{self.currentmenu['title']} - {self._uimode}")
+        print(f"{self.scale.root} - {self.scale.scale_name} - {self.scale.chord_name}")
         for idx, item in list(enumerate(self.actions))[::-1]:
             print(
                 f"{'>' if self.currentselection == idx else ' '}  {idx + 1}. {item['title']}"
@@ -68,3 +85,68 @@ class Menu(EventListener):
         elif msg.control == 2 and msg.value == 127:
             # Emergency quit with left arrow
             self.ec.publish("quit")
+
+    def scaletype(self):
+        return [
+            {
+                "id": scalename,
+                "title": scalename,
+                "action": "set_scale",
+                "args": [scalename],
+            }
+            for scalename in self.scale.available_scales
+        ]
+
+    def chordtype(self):
+        return [
+            {
+                "id": chordname,
+                "title": chordname,
+                "action": "set_chord",
+                "args": [chordname],
+            }
+            for chordname in self.scale.available_chords
+        ]
+
+    def tick(self, _event, step):
+        # For debug purpose
+        if step % 20 != 0:
+            return
+        step = int(step / 20)
+        actions = [
+            None,
+            0,
+            0,
+            3,
+            0,
+            0,
+            0,
+            3,
+            1,
+            1,
+            1,
+            3,
+            0,
+            0,
+            0,
+            3,
+            0,
+            0,
+            3,
+            1,
+            1,
+            3,
+            None,
+            2,
+        ]
+        try:
+            action = actions[step]
+        except IndexError:
+            return
+
+        if action is None:
+            return
+        self.user_action(
+            "control_change",
+            mido.Message("control_change", channel=15, control=action, value=127),
+        )

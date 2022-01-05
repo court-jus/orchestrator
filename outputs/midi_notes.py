@@ -10,4 +10,5 @@ class MidiNotes:
         if not isinstance(msg, mido.Message):
             return
         msg.channel = self.channel
-        self.port.send(msg)
+        if self.port:
+            self.port.send(msg)

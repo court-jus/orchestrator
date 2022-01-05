@@ -18,30 +18,21 @@
                 "title": "Set scale",
                 "action": "menu",
                 "args": ["$.scaletype"]
+            },
+            {
+                "id": "set_chord",
+                "title": "Set chord",
+                "action": "menu",
+                "args": ["$.chordtype"]
             }
         ]
     },
     "scaletype": {
         "title": "Choose scale",
-        "items": [
-            {
-                "id": "main",
-                "title": "Back to main menu",
-                "action": "menu",
-                "args": ["$.main"]
-            },
-            {
-                "id": "major",
-                "title": "Major",
-                "action": "set_scale",
-                "args": ["major"]
-            },
-            {
-                "id": "minor",
-                "title": "Minor",
-                "action": "set_scale",
-                "args": ["minor"]
-            }
-        ]
+        "items": "scaletype"
+    },
+    "chordtype": {
+        "title": "Choose chord",
+        "items": "chordtype"
     }
 }

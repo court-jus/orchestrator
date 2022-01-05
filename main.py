@@ -14,9 +14,10 @@ from .ui import Menu
 
 def quit(ports):
     for port in ports:
-        print("Closing port", port)
-        port.close()
-        print("Port", port, "closed")
+        if port:
+            print("Closing port", port)
+            port.close()
+            print("Port", port, "closed")
     sys.exit(0)
 
 
@@ -63,8 +64,10 @@ def main():
     ec.subscribe("tick", rt2.tick)
 
     # UI
-    menu = Menu(ec)
+    menu = Menu(ec, sc)
     menu.display()
+    # ec.subscribe("tick", menu.tick)
+    ec.subscribe("display", menu.display)
     ec.subscribe("control_change", menu.user_action)
 
     try:
