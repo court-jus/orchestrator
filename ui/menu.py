@@ -43,7 +43,9 @@ class Menu(EventListener):
 
     def display(self, _event=None, _msg=None):
         print(f"{self.currentmenu['title']} - {self._uimode}")
-        print(f"{self.scale.root} - {self.scale.scale_name} - {self.scale.chord_name}")
+        print(
+            f"{self.scale.root} - {self.scale.scale_name} - {self.scale.chord_name} - {self.scale.degree + 1}"
+        )
         for idx, item in list(enumerate(self.actions))[::-1]:
             print(
                 f"{'>' if self.currentselection == idx else ' '}  {idx + 1}. {item['title']}"

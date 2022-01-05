@@ -48,20 +48,13 @@ def main():
 
     # Emitters
     crd = ChordsEmitter(ec, sc, output=chords)
-    ec.subscribe("tick", crd.tick)
-    ec.subscribe("control_change", crd.control_change)
     rne = RandomNoteEmitter(ec, sc, range=(60, 72), output=vt1)
-    ec.subscribe("tick", rne.tick)
-    ec.subscribe("control_change", rne.control_change)
 
     # with a clock at 120bpm and 120ticks per quarter
     # 6 at 4/16 = 120bpm
     # Rythm
-    rt1 = BresenhamEuclideanRythm(rne, base=6, pulses=10, length=16)
-    ec.subscribe("tick", rt1.tick)
-    ec.subscribe("control_change", rt1.control_change)
-    rt2 = BresenhamEuclideanRythm(crd, base=6, pulses=1, length=16)
-    ec.subscribe("tick", rt2.tick)
+    BresenhamEuclideanRythm(ec, rne, base=6, pulses=10, length=16)
+    BresenhamEuclideanRythm(ec, crd, base=6, pulses=1, length=16)
 
     # UI
     menu = Menu(ec, sc)

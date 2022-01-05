@@ -3,7 +3,10 @@ from ..core.events import EventListener
 
 
 class BresenhamEuclideanRythm(EventListener):
-    def __init__(self, output, base=10, pulses=4, length=16):
+    def __init__(self, ec, output, base=10, pulses=4, length=16):
+        self.ec = ec
+        ec.subscribe("tick", self.tick)
+        ec.subscribe("control_change", self.control_change)
         self.output = output
         self.base = base
         self.pulses = pulses

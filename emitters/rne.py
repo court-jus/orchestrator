@@ -6,6 +6,8 @@ import mido
 class RandomNoteEmitter(EventListener):
     def __init__(self, ec, scale, output, range=(0, 127)):
         self.ec = ec
+        ec.subscribe("tick", self.tick)
+        ec.subscribe("control_change", self.control_change)
         self.scale = scale
         self.note_duration = 5
         self.current_note = None

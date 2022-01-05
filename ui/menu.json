@@ -8,10 +8,10 @@
                 "action": "quit"
             },
             {
-                "id": "set_root",
-                "title": "Set root note",
+                "id": "transpose",
+                "title": "Transpose",
                 "action": "uimode",
-                "args": ["set_root"]
+                "args": ["transpose"]
             },
             {
                 "id": "set_scale",

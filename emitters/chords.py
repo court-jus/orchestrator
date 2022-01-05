@@ -5,11 +5,10 @@ import mido
 class ChordsEmitter(EventListener):
     def __init__(self, ec, scale, output, note_duration=100):
         self.ec = ec
+        ec.subscribe("tick", self.tick)
         self.scale = scale
         self.current_notes = {}
         self.note_duration = note_duration
-        self.chord = [0, 2, 4, 6]
-        self.base_note = 60
         self.output = output
         super().__init__(ec)
 
@@ -32,19 +31,8 @@ class ChordsEmitter(EventListener):
 
     def get_notes(self):
         scale_notes = sorted(self.scale.available_notes)
-        base_note_index = scale_notes.index(self.base_note)
-        return [scale_notes[base_note_index + degree] for degree in self.chord]
-
-    def control_change(self, _event, msg):
-        if msg.channel != 15:
-            return
-        if msg.control == 33:
-            self.change_degree(msg.value)
-        print(msg)
-
-    def change_degree(self, value):
-        value = min(126, value)
-        degrees = len(self.scale.base_notes)
-        new_degree = self.scale.base_notes[int(value * degrees / 127)]
-        self.base_note = new_degree
-        print("nd", new_degree, self.get_notes())
+        root_note_index = scale_notes.index(self.scale.root)
+        return [
+            scale_notes[root_note_index + self.scale.degree + degree]
+            for degree in self.scale.current_chord
+        ]
