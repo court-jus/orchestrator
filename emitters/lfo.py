@@ -1,14 +1,11 @@
-import mido
 import math
 
-from .events import EventListener
-from .values import Value
-
-v = Value
+from ..events.listener import EventListener
+from .value import Value
 
 
 class LFO(EventListener, Value):
-    def __init__(self, ec, min=v(0), max=v(127), rate=v(1), shape="sin"):
+    def __init__(self, ec, min=Value(0), max=Value(127), rate=Value(1), shape="sin"):
         self.value = 0
         self.min = min
         self.max = max
@@ -24,7 +21,8 @@ class LFO(EventListener, Value):
     def tick(self, _evt, step):
         value = getattr(LFO, self.shape)(step / self.rate())
         self.value = int((value * (self.max() - self.min()) / 127) + self.min())
-        # print("LFO value", self.value, step, step / self.rate)
+        if self.ec.debug:
+            print("LFO value", self.value, step, step / self.rate)
 
     @staticmethod
     def sin(value):

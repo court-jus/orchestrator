@@ -1,6 +1,6 @@
 import math
-from ..core import EventListener, LFO
-from ..core.values import Value as v
+from ..events.listener import EventListener
+from .value import Value as v
 
 
 class BresenhamEuclideanRythm(EventListener):
@@ -44,7 +44,8 @@ class BresenhamEuclideanRythm(EventListener):
         rythm = bresenham_euclidean_rythm(
             lambda x: x * self.pulses() / self.length(), self.length()
         )
-        print("".join(map(lambda i: "x" if i else ".", rythm)))
+        if self.ec.debug:
+            print("".join(map(lambda i: "x" if i else ".", rythm)))
 
 
 class BresenhamCurveRythm(EventListener):
@@ -73,15 +74,3 @@ def bresenham_euclidean_rythm(func, pulses):
         result.append(1 if y != previous else 0)
         previous = y
     return result
-
-
-# def to_str(i):
-#     return "x" if i else "."
-
-
-# def display(rythm):
-#     print("".join(map(to_str, rythm)))
-
-
-# display(bresenham_euclidean_rythm(lambda x: 2 * math.sin(x), 40))
-# display(bresenham_euclidean_rythm(lambda x: x * 5 / 13, 40))

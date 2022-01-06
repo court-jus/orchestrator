@@ -1,4 +1,4 @@
-from ..core import EventListener
+from ..events.listener import EventListener
 import mido
 
 

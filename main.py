@@ -1,16 +1,19 @@
-import math
 import sys
 import time
 
-from .core import EventChannel, LFO
-from .core.values import Value as v
-from .emitters import ChordsEmitter, RandomNoteEmitter
+from .emitters import (
+    LFO,
+    BresenhamEuclideanRythm,
+    ChordsEmitter,
+    RandomNoteEmitter,
+    RandomValue,
+)
+from .emitters import Value as v
+from .events.channel import EventChannel
 from .master import Clock, Scale
-from .outputs import MidiNotes
-from .rythm import BresenhamEuclideanRythm
-from .tools import get_port
-from .transformers import VelocityTransformer
-from .ui import Menu
+from .outputs.midi_notes import MidiNotes
+from .tools.midi import get_port
+from .ui.menu import Menu
 
 
 def quit(ports):
@@ -43,9 +46,6 @@ def main():
 
     sc = Scale(ec)
 
-    # Transformers
-    vt1 = VelocityTransformer(output=lead, min=30, max=70)
-
     # Emitters
     crd = ChordsEmitter(ec, sc, output=chords)
     rne = RandomNoteEmitter(
@@ -53,8 +53,9 @@ def main():
         sc,
         range_size=LFO(ec, rate=v(300), min=v(1), max=v(18)),
         range_center=LFO(ec, rate=v(100), min=v(50), max=v(75)),
-        output=vt1,
+        velocity=RandomValue(min=v(30), max=v(70)),
         note_duration=LFO(ec, rate=v(80), min=v(10), max=v(55)),
+        output=lead,
     )
 
     # with a clock at 120bpm and 120ticks per quarter

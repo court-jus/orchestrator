@@ -2,7 +2,7 @@ import mido
 import json
 from jsonpath_ng import parse
 
-from ..core import EventListener
+from ..events.listener import EventListener
 
 
 class Menu(EventListener):

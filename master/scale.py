@@ -1,5 +1,5 @@
 import json
-from ..core import EventListener
+from ..events.listener import EventListener
 
 
 class Scale(EventListener):
@@ -68,7 +68,6 @@ class Scale(EventListener):
         self.set_chord(chord_name=chord_name)
 
     def noteon(self, event, msg):
-        print(self._uimode)
         if self._uimode == "transpose":
             self.transpose(msg.note)
             if self.ec:

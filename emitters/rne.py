@@ -1,12 +1,19 @@
-from ..core import EventListener
-from ..core.values import Value as v
+from ..events.listener import EventListener
+from .value import Value as v
 import random
 import mido
 
 
 class RandomNoteEmitter(EventListener):
     def __init__(
-        self, ec, scale, output, range_center=v(60), range_size=v(6), note_duration=v(5)
+        self,
+        ec,
+        scale,
+        output,
+        range_center=v(60),
+        range_size=v(6),
+        note_duration=v(5),
+        velocity=v(64),
     ):
         self.scale = scale
         self.note_duration = note_duration
@@ -15,6 +22,7 @@ class RandomNoteEmitter(EventListener):
         self.output = output
         self.range_center = range_center
         self.range_size = range_size
+        self.velocity = velocity
         super().__init__(ec)
         if self.ec:
             ec.subscribe("tick", self.tick)
@@ -27,7 +35,8 @@ class RandomNoteEmitter(EventListener):
             for n in self.scale.available_notes
             if n >= self.get_low_boundary() and n <= self.get_high_boundary()
         ]
-        # print("RNE range notes", range_notes)
+        if self.ec.debug:
+            print("RNE range notes", range_notes)
         if not range_notes:
             # Find the available note that is the closest to the range
             self.current_note = int(
@@ -42,7 +51,9 @@ class RandomNoteEmitter(EventListener):
         else:
             self.current_note = random.choice(range_notes)
 
-        self.output.send(mido.Message("note_on", note=self.current_note))
+        self.output.send(
+            mido.Message("note_on", note=self.current_note, velocity=self.velocity())
+        )
         self.stopat = msg + self.note_duration()
 
     def tick(self, _event, step):
