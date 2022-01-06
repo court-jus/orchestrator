@@ -2,7 +2,8 @@ import math
 import sys
 import time
 
-from .core import EventChannel
+from .core import EventChannel, LFO
+from .core.values import Value as v
 from .emitters import ChordsEmitter, RandomNoteEmitter
 from .master import Clock, Scale
 from .outputs import MidiNotes
@@ -41,20 +42,34 @@ def main():
     Clock(ec)
 
     sc = Scale(ec)
-    sc.set_scale("major")
 
     # Transformers
-    vt1 = VelocityTransformer(output=lead, min=50, max=100)
+    vt1 = VelocityTransformer(output=lead, min=30, max=70)
 
     # Emitters
     crd = ChordsEmitter(ec, sc, output=chords)
-    rne = RandomNoteEmitter(ec, sc, range=(60, 72), output=vt1)
+    rne = RandomNoteEmitter(
+        ec,
+        sc,
+        range_size=LFO(ec, rate=v(300), min=v(1), max=v(18)),
+        range_center=LFO(ec, rate=v(100), min=v(50), max=v(75)),
+        output=vt1,
+        note_duration=LFO(ec, rate=v(80), min=v(10), max=v(55)),
+    )
 
     # with a clock at 120bpm and 120ticks per quarter
     # 6 at 4/16 = 120bpm
     # Rythm
-    BresenhamEuclideanRythm(ec, rne, base=6, pulses=10, length=16)
-    BresenhamEuclideanRythm(ec, crd, base=6, pulses=1, length=16)
+    BresenhamEuclideanRythm(
+        ec,
+        rne,
+        base=v(6),
+        pulses=LFO(
+            ec, rate=LFO(ec, rate=v(200), min=v(50), max=v(250)), min=v(3), max=v(13)
+        ),
+        length=v(32),
+    )
+    BresenhamEuclideanRythm(ec, crd, base=v(6), pulses=v(2), length=v(32))
 
     # UI
     menu = Menu(ec, sc)

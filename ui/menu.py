@@ -2,12 +2,11 @@ import mido
 import json
 from jsonpath_ng import parse
 
-from ..core.events import EventListener
+from ..core import EventListener
 
 
 class Menu(EventListener):
     def __init__(self, ec, scale):
-        self.ec = ec
         self.scale = scale
         with open("orchestrator/ui/menu.json", "r") as fp:
             self.menu = json.load(fp)
@@ -79,14 +78,16 @@ class Menu(EventListener):
                 self.initmenu(menuitem["args"][0])
                 self.display()
             else:
-                self.ec.publish(
-                    menuitem["action"],
-                    *menuitem.get("args", []),
-                    **menuitem.get("kwargs", {}),
-                )
+                if self.ec:
+                    self.ec.publish(
+                        menuitem["action"],
+                        *menuitem.get("args", []),
+                        **menuitem.get("kwargs", {}),
+                    )
         elif msg.control == 2 and msg.value == 127:
             # Emergency quit with left arrow
-            self.ec.publish("quit")
+            if self.ec:
+                self.ec.publish("quit")
 
     def scaletype(self):
         return [

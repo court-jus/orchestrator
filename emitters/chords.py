@@ -1,10 +1,9 @@
-from ..core.events import EventListener
+from ..core import EventListener
 import mido
 
 
 class ChordsEmitter(EventListener):
     def __init__(self, ec, scale, output, note_duration=100):
-        self.ec = ec
         ec.subscribe("tick", self.tick)
         self.scale = scale
         self.current_notes = {}

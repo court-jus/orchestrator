@@ -1,42 +1,49 @@
-from ..core.events import EventListener
+from ..core import EventListener
+from ..core.values import Value as v
 import random
 import mido
 
 
 class RandomNoteEmitter(EventListener):
-    def __init__(self, ec, scale, output, range=(0, 127)):
-        self.ec = ec
-        ec.subscribe("tick", self.tick)
-        ec.subscribe("control_change", self.control_change)
+    def __init__(
+        self, ec, scale, output, range_center=v(60), range_size=v(6), note_duration=v(5)
+    ):
         self.scale = scale
-        self.note_duration = 5
+        self.note_duration = note_duration
         self.current_note = None
         self.stopat = None
         self.output = output
-        self.range_size = (range[1] - range[0]) / 2
-        self.range_center = (range[1] + range[0]) / 2
-        self.compute_range()
+        self.range_center = range_center
+        self.range_size = range_size
         super().__init__(ec)
+        if self.ec:
+            ec.subscribe("tick", self.tick)
 
     def send(self, msg):
-        if not self.scale.available_notes or not msg or not self.range:
+        if not self.scale.available_notes or not msg:
             return
         range_notes = [
             n
             for n in self.scale.available_notes
-            if n >= self.range[0] and n <= self.range[1]
+            if n >= self.get_low_boundary() and n <= self.get_high_boundary()
         ]
+        # print("RNE range notes", range_notes)
         if not range_notes:
             # Find the available note that is the closest to the range
             self.current_note = int(
-                self.range[0]
-                - min([abs(self.range[0] - n) for n in self.scale.available_notes])
+                self.get_low_boundary()
+                - min(
+                    [
+                        abs(self.get_low_boundary() - n)
+                        for n in self.scale.available_notes
+                    ]
+                )
             )
         else:
             self.current_note = random.choice(range_notes)
 
         self.output.send(mido.Message("note_on", note=self.current_note))
-        self.stopat = msg + self.note_duration
+        self.stopat = msg + self.note_duration()
 
     def tick(self, _event, step):
         if self.stopat and self.current_note is not None and self.stopat == step:
@@ -50,21 +57,23 @@ class RandomNoteEmitter(EventListener):
         elif msg.control == 24:
             self.change_range_size(msg.value)
 
-    def change_range_position(self, value):
-        self.range_center = min(max(value, self.range_size), 127 - self.range_size)
-        self.compute_range()
+    def get_range_center(self):
+        return min(
+            max(self.range_center(), self.get_range_size()), 127 - self.get_range_size()
+        )
 
-    def change_range_size(self, value):
-        self.range_size = max(1, value) / 2
-        self.compute_range()
+    def get_range_size(self):
+        return max(1, self.range_size()) / 2
 
     def compute_range(self):
-        low_value = max(0, self.range_center - self.range_size)
-        high_value = min(127, self.range_center + self.range_size)
+        low_value = max(0, self.get_range_center() - self.get_range_size())
+        high_value = min(127, self.get_range_center() + self.get_range_size())
         if high_value < low_value + 1:
             high_value = low_value + 1
-        self.range = (
-            low_value,
-            high_value,
-        )
-        print(self.range)
+        return low_value, high_value
+
+    def get_low_boundary(self):
+        return self.compute_range()[0]
+
+    def get_high_boundary(self):
+        return self.compute_range()[1]
