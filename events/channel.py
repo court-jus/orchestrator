@@ -12,6 +12,18 @@ class EventChannel:
                 filter(lambda x: x is not callback, self.subscribers[event])
             )
 
+    def unsubscribe_all(self, instance):
+        for event in self.subscribers:
+            self.subscribers[event] = list(
+                filter(
+                    lambda x: x is not instance
+                    and (
+                        x.__self__ is not instance if hasattr(x, "__self__") else True
+                    ),
+                    self.subscribers[event],
+                )
+            )
+
     def subscribe(self, event, callback):
         self.subscribers.setdefault(event, [])
         if callback not in self.subscribers[event]:

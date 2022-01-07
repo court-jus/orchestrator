@@ -22,7 +22,7 @@ class LFO(EventListener, Value):
         value = getattr(LFO, self.shape)(step / self.rate())
         self.value = int((value * (self.max() - self.min()) / 127) + self.min())
         if self.ec.debug:
-            print("LFO value", self.value, step, step / self.rate)
+            print("LFO value", self.value, step, step / self.rate())
 
     @staticmethod
     def sin(value):

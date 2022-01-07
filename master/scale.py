@@ -18,12 +18,16 @@ class Scale(EventListener):
         self.degree = 0
         super().__init__(ec)
         if self.ec:
-            self.ec.subscribe("note_on", self.noteon)
-            self.ec.subscribe("control_change", self.control_change)
-            self.ec.subscribe("set_scale", self.on_set_scale)
-            self.ec.subscribe("set_chord", self.on_set_chord)
+            self.set_event_channel(ec)
         self.set_scale(self.scale_name, 60)
         self.set_chord(self.chord_name)
+
+    def set_event_channel(self, ec):
+        super().set_event_channel(ec)
+        self.ec.subscribe("note_on", self.noteon)
+        self.ec.subscribe("control_change", self.control_change)
+        self.ec.subscribe("set_scale", self.on_set_scale)
+        self.ec.subscribe("set_chord", self.on_set_chord)
 
     def transpose(self, root):
         oldroot = self.root

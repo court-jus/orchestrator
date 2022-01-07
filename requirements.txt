@@ -1,3 +1,4 @@
 python-rtmidi==1.4.9
 mido==1.2.10
 jsonpath-ng==1.5.3
+remi==2021.3.2

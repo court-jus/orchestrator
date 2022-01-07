@@ -108,7 +108,7 @@ class Menu(EventListener):
                 "action": "set_chord",
                 "args": [chordname],
             }
-            for chordname in self.scale.available_chords
+            for chordname, _ in self.scale.available_chords
         ]
 
     def tick(self, _event, step):

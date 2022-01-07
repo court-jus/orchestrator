@@ -1,6 +1,8 @@
 import sys
 import time
 
+from remi import start
+
 from .emitters import (
     LFO,
     BresenhamEuclideanRythm,
@@ -9,11 +11,11 @@ from .emitters import (
     RandomValue,
 )
 from .emitters import Value as v
-from .events.channel import EventChannel
-from .master import Clock, Scale
+from .master import Clock, global_controller
 from .outputs.midi_notes import MidiNotes
 from .tools.midi import get_port
 from .ui.menu import Menu
+from .ui.remiui import RemiUI
 
 
 def quit(ports):
@@ -26,8 +28,9 @@ def quit(ports):
 
 
 def main():
-    # Events handling
-    ec = EventChannel()
+    ctrl = global_controller
+    ec = ctrl.ec
+    sc = ctrl.scale
 
     # MIDI Ports
     inport = get_port("keyboard", direction="input", callback=ec.publish)
@@ -43,8 +46,6 @@ def main():
 
     # Master
     Clock(ec)
-
-    sc = Scale(ec)
 
     # Emitters
     crd = ChordsEmitter(ec, sc, output=chords)
@@ -79,12 +80,8 @@ def main():
     ec.subscribe("display", menu.display)
     ec.subscribe("control_change", menu.user_action)
 
-    try:
-        while True:
-            time.sleep(1)
-            ec.publish("heartbeat")
-    finally:
-        quit(all_ports)
+    start(RemiUI)
+    quit(all_ports)
 
 
 if __name__ == "__main__":
