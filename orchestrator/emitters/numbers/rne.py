@@ -1,33 +1,25 @@
-from ..events.listener import EventListener
-from .value import Value as v
+from ...master.controller import global_controller
+from .value import Value
 import random
 import mido
 
 
-class RandomNoteEmitter(EventListener):
+class RandomNoteEmitter(Value):
     def __init__(
         self,
-        ec,
-        scale,
-        output,
-        range_center=v(60),
-        range_size=v(6),
-        note_duration=v(5),
-        velocity=v(64),
+        range_center=Value(60),
+        range_size=Value(6),
+        note_duration=Value(5),
+        velocity=Value(64),
     ):
-        self.scale = scale
         self.note_duration = note_duration
         self.current_note = None
         self.stopat = None
-        self.output = output
         self.range_center = range_center
         self.range_size = range_size
         self.velocity = velocity
-        super().__init__(ec)
-        if self.ec:
-            ec.subscribe("tick", self.tick)
 
-    def send(self, msg):
+    def __call__(self):
         if not self.scale.available_notes or not msg:
             return
         range_notes = [

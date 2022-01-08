@@ -1,6 +1,6 @@
 import math
 
-from ..events.listener import EventListener
+from ...events.listener import EventListener
 from .value import Value
 
 
