@@ -1,3 +1,4 @@
 local_tests
 __pycache__
 .venv
+save.json

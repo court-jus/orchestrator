@@ -3,7 +3,7 @@ from ..events.listener import EventListener
 
 
 class Scale(EventListener):
-    def __init__(self, ec=None):
+    def __init__(self, global_controller):
         self.available_notes = []
         self.current_chord = []
         self.root = None
@@ -13,14 +13,31 @@ class Scale(EventListener):
             self.available_scales = json.load(fp)
         with open("orchestrator/master/chords.json", "r") as fp:
             self.available_chords = json.load(fp)
+        self.save_id = "global_scale"
+        # Defaults
         self.scale_name = "gypsy min"
         self.chord_name = "7"
+        self.root = 60
+        # Saved values
+        if self.save_id in global_controller.loaded:
+            saved = global_controller.loaded[self.save_id]
+            self.scale_name = saved["scale"]
+            self.chord_name = saved["chord"]
+            self.root = saved["root"]
         self.degree = 0
-        super().__init__(ec)
+        super().__init__(global_controller.ec)
         if self.ec:
-            self.set_event_channel(ec)
-        self.set_scale(self.scale_name, 60)
+            self.set_event_channel(self.ec)
+        self.set_scale(self.scale_name, self.root)
         self.set_chord(self.chord_name)
+        global_controller.savables[self.save_id] = self
+
+    def save(self):
+        return {
+            "scale": self.scale_name,
+            "chord": self.chord_name,
+            "root": self.root,
+        }
 
     def set_event_channel(self, ec):
         super().set_event_channel(ec)

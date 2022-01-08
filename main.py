@@ -24,6 +24,7 @@ from orchestrator.ui.remiui import RemiUI
 
 
 def quit(ports):
+    global_controller.save()
     for port in ports:
         if port:
             print("Closing port", port)
