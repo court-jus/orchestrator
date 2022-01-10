@@ -41,7 +41,7 @@ def main():
     clockport = get_port("midiclock", direction="input", callback=gc.ec.publish)
     all_ports = [midikbd, midictrl, clockport]
 
-    opened_ports = loadsong("song1.json", global_controller)
+    opened_ports, song = loadsong("song1.json", global_controller)
     all_ports.extend(opened_ports)
 
     # with a clock at 120bpm and 120ticks per quarter
