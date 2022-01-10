@@ -1,19 +1,30 @@
-import mido
 import json
+import os
+import logging
+
+
+import mido
 from jsonpath_ng import parse
 
 from ..events.listener import EventListener
 from ..tools.midi import list_inputs
+from ..tools.midi import filter_events
+
+
+logger = logging.getLogger("Menu")
 
 
 class Menu(EventListener):
     def __init__(self, global_controller):
-        self.scale = global_controller.scale
-        ec = global_controller.ec
+        self.gc = global_controller
+        self.scale = self.gc.scale
+        ec = self.gc.ec
         with open("orchestrator/ui/menu.json", "r") as fp:
             self.menu = json.load(fp)
         self.initmenu("$.main")
         super().__init__(ec)
+        self.ec.subscribe("choose_port", self.choose_port)
+        self.ec.subscribe("loadsong", self.loadsong)
 
     def initmenu(self, menupath):
         self.currentmenupath = menupath
@@ -29,7 +40,6 @@ class Menu(EventListener):
             # Add a "back to main menu" action
             self.actions.append(
                 {
-                    "id": "main",
                     "title": "Back to main menu",
                     "action": "menu",
                     "args": ["$.main"],
@@ -94,7 +104,6 @@ class Menu(EventListener):
     def scaletype(self):
         return [
             {
-                "id": scalename,
                 "title": scalename,
                 "action": "set_scale",
                 "args": [scalename],
@@ -105,14 +114,13 @@ class Menu(EventListener):
     def chordtype(self):
         return [
             {
-                "id": chordname,
                 "title": chordname,
                 "action": "set_chord",
                 "args": [chordname],
             }
             for chordname, _ in self.scale.available_chords
         ]
-    
+
     def midiclocks(self):
         return [
             {
@@ -123,7 +131,7 @@ class Menu(EventListener):
             }
             for deviceid, devicename in list_inputs()
         ]
-    
+
     def midinote(self):
         return [
             {
@@ -134,7 +142,55 @@ class Menu(EventListener):
             }
             for deviceid, devicename in list_inputs()
         ]
-    
+
+    def listsongs_to_load(self):
+        return [
+            {
+                "title": filename,
+                "action": "loadsong",
+                "args": [filename],
+            }
+            for filename in os.listdir("songs")
+        ]
+
+    def loadsong(self, _event, filename):
+        from ..song import loadsong
+
+        print("LOAD SONG", filename)
+        opened_ports, song = loadsong(os.path.join("songs", filename), self.gc)
+        self.gc.opened_ports.extend(opened_ports)
+        logger.debug("Song loaded: {song}")
+
+    def choose_port(self, _event, action, direction, filtered_events, portname=None):
+        logger.debug(f"{action} for {direction} (args: {filtered_events}, {portname})")
+        if action == "list_ports":
+            self.actions = []
+            # Add a "back to main menu" action
+            self.actions.append(
+                {
+                    "title": "Back to main menu",
+                    "action": "menu",
+                    "args": ["$.main"],
+                }
+            )
+            port_lister = (
+                mido.get_output_names if direction == "output" else mido.get_input_names
+            )
+            for portname in port_lister():
+                self.actions.append(
+                    {
+                        "title": portname,
+                        "action": "choose_port",
+                        "args": ["choose", direction, filtered_events, portname],
+                    }
+                )
+            self.ec.publish("display")
+        elif action == "choose":
+            port_getter = mido.open_output if direction == "output" else mido.open_input
+            kwargs = {"callback": filter_events(self.gc.ec.publish, filtered_events)}
+            kwargs.update({"autoreset": True} if direction == "output" else {})
+            self.gc.opened_ports.append(port_getter(portname, **kwargs))
+
     def tick(self, _event, step, *_a, **_kw):
         # For debug purpose
         return

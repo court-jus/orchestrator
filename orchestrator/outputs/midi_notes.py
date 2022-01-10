@@ -1,7 +1,12 @@
+import logging
+
 import mido
-from ..master.controller import global_controller
+
 from ..emitters import Value
+from ..master.controller import global_controller
 from ..tools.midi import get_port
+
+logger = logging.getLogger("MidiNotes")
 
 
 class MidiNotes:
@@ -18,8 +23,7 @@ class MidiNotes:
         for note, (stopat, msg_off) in self.msg_buffer.items():
             if stopat == step:
                 if self.port:
-                    if global_controller.ec.debug:
-                        print(msg_off)
+                    logger.debug(msg_off)
                     self.port.send(msg_off)
                 stopped.append(note)
         for n in stopped:
@@ -43,6 +47,7 @@ class MidiNotes:
             # Stop note if already playing
             msg_off = self.msg_buffer.pop(msg.note, None)
             if msg_off and self.port:
+                logger.debug(msg_off[1])
                 self.port.send(msg_off[1])
 
             # Play and store off message
@@ -53,9 +58,13 @@ class MidiNotes:
 
         if self.opened_port:
             msg.channel = self.channel
-            if global_controller.ec.debug:
-                print(msg)
+            logger.debug(msg)
             self.port.send(msg)
+
+    def clear(self, *args):
+        for subitem in [self.duration, self.velocity]:
+            subitem.clear(*args)
+        global_controller.ec.unsubscribe_all(self)
 
     def close(self):
         if self.port:

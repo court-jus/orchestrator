@@ -1,5 +1,9 @@
 import json
+import logging
+
 from ..events.listener import EventListener
+
+logger = logging.getLogger("Scale")
 
 
 class Scale(EventListener):
@@ -87,6 +91,7 @@ class Scale(EventListener):
         self.current_chord = dict(self.available_chords)[self.chord_name]
         if self.ec:
             self.ec.publish("display")
+        logger.debug("New chord", self.chord_name)
 
     def on_set_scale(self, _evt, scale_name="ionian - major", root=None, *_a, **_kw):
         self.set_scale(scale_name=scale_name, root=root)
@@ -110,4 +115,4 @@ class Scale(EventListener):
             value = msg.control - 48
             degrees = len(self.base_notes)
             self.degree = int(value * degrees / 8)
-            print("ND", self.degree)
+            logger.debug("New chord degree", self.degree)

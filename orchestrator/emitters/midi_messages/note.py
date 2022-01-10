@@ -1,4 +1,5 @@
 import mido
+
 from ...events.listener import EventListener
 
 

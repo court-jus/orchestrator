@@ -3,24 +3,74 @@
         "title": "Main menu",
         "items": [
             {
-                "id": "quit",
                 "title": "Quit",
                 "action": "quit"
             },
             {
-                "id": "transpose",
+                "title": "Settings",
+                "action": "menu",
+                "args": ["$.settings"]
+            },
+            {
+                "title": "Perform live",
+                "action": "menu",
+                "args": ["$.perform"]
+            },
+            {
+                "title": "Song menu",
+                "action": "menu",
+                "args": ["$.song"]
+            }
+        ]
+    },
+    "settings": {
+        "title": "Settings",
+        "items": [
+            {
+                "title": "MIDI",
+                "action": "menu",
+                "args": ["$.midi_settings"]
+            }
+        ]
+    },
+    "midi_settings": {
+        "title": "Midi Settings",
+        "items": [
+            {
+                "title": "Close all ports",
+                "action": "close"
+            },
+            {
+                "title": "Choose MIDI Clock input port",
+                "action": "choose_port",
+                "args": ["list_ports", "input", ["clock"]]
+            },
+            {
+                "title": "Add a MIDI Controller input port",
+                "action": "choose_port",
+                "args": ["list_ports", "input", ["control_change"]]
+            },
+            {
+                "title": "Add a MIDI Keyboard input port",
+                "action": "choose_port",
+                "args": ["list_ports", "input", ["note_on", "note_off"]]
+            }
+        ]
+    },
+    "perform": {
+        "title": "Perform",
+        "items": [
+            {
                 "title": "Transpose",
                 "action": "uimode",
                 "args": ["transpose"]
             },
             {
-                "id": "set_scale",
                 "title": "Set scale",
                 "action": "menu",
                 "args": ["$.scaletype"]
             },
             {
-                "id": "set_chord",
                 "title": "Set chord",
                 "action": "menu",
                 "args": ["$.chordtype"]
@@ -33,7 +83,7 @@
             }
         ]
     },
-    "settings": {
+    "settings2": {
         "title": "Settings",
         "items": [
             {
@@ -69,6 +119,24 @@
         "title": "Choose MIDI Note input device",
         "items": "midinote"
     },
+    "song": {
+        "title": "Song menu",
+        "items": [
+            {
+                "title": "New",
+                "action": "new_song"
+            },
+            {
+                "title": "Load",
+                "action": "menu",
+                "args": ["$.loadsong"]
+            },
+            {
+                "title": "Save",
+                "action": "save_song"
+            }
+        ]
+    },
     "scaletype": {
         "title": "Choose scale",
         "items": "scaletype"
@@ -76,5 +144,9 @@
     "chordtype": {
         "title": "Choose chord",
         "items": "chordtype"
+    },
+    "loadsong": {
+        "title": "Choose song to load",
+        "items": "listsongs_to_load"
     }
 }

@@ -1,6 +1,10 @@
+import logging
+
 from ...events.listener import EventListener
-from .value import Value
 from ...master.controller import global_controller
+from .value import Value
+
+logger = logging.getLogger("MidiControl")
 
 
 class MidiControl(EventListener, Value):
@@ -18,6 +22,7 @@ class MidiControl(EventListener, Value):
         return self.value
 
     def save(self):
+        logger.debug(f"Midi CC ({self.channel, self.control})={self.value}")
         return self.value
 
     def control_change(self, _evt, msg, *_a, **_kw):

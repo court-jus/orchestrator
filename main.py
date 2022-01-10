@@ -1,5 +1,6 @@
 import sys
 import time
+import logging
 
 from remi import Server
 
@@ -10,8 +11,12 @@ from orchestrator.ui.menu import Menu
 from orchestrator.ui.remiui import RemiUI
 
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger("main")
+
+
 def quit(closables, server):
-    print("QUIT!!, Stop server")
+    logger.info("QUIT!!")
     server.stop()
     print("QUIT!!, Server stopped, close midi ports")
     global_controller.save()
@@ -21,14 +26,6 @@ def quit(closables, server):
             closable.close()
             print(closable, "closed")
     sys.exit(0)
-
-
-def filter_clock(callback):
-    def receive(msg):
-        if msg.type != "clock":
-            callback(msg)
-
-    return receive
 
 
 def main():

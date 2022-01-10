@@ -1,5 +1,9 @@
+import logging
 import math
+
 from ..numbers.value import Value as v
+
+logger = logging.getLogger("euclidean")
 
 
 class BresenhamEuclideanRythm:
@@ -39,9 +43,15 @@ class BresenhamEuclideanRythm:
         rythm = bresenham_euclidean_rythm(
             lambda x: x * self.pulses() / self.length(), self.length()
         )
-        print("".join(map(lambda i: "x" if i else ".", rythm)))
+        logger.debug("".join(map(lambda i: "x" if i else ".", rythm)))
         if x is not None:
-            print("".join(["^" if x == idx else " " for idx, _ in enumerate(rythm)]))
+            logger.debug(
+                "".join(["^" if x == idx else " " for idx, _ in enumerate(rythm)])
+            )
+
+    def clear(self, *args):
+        for subitem in [self.base, self.pulses, self.length]:
+            subitem.clear(*args)
 
 
 class BresenhamCurveRythm:

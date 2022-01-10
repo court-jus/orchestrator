@@ -7,7 +7,7 @@ class RemiUI(App):
     def __init__(self, *args):
         global_controller.ec.subscribe("display", self.display)
         super().__init__(*args)
-    
+
     def main(self):
         self.main_container = gui.VBox(width=320, height=240)
         global_controller.main_label = gui.Label()
@@ -18,7 +18,7 @@ class RemiUI(App):
         self.main_container.append(global_controller.menu_container, key="menu")
         self.display()
         return self.main_container
-    
+
     def do_gui_update(self):
         menu = global_controller.menu
         global_controller.main_label.set_text(
@@ -59,3 +59,6 @@ class RemiUI(App):
                     **menuitem.get("kwargs", {}),
                 )
         self.display()
+
+    def clear(self, *_args):
+        global_controller.ec.unsubscribe_all(self)

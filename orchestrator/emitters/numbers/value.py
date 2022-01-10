@@ -4,3 +4,6 @@ class Value:
 
     def __call__(self):
         return self.value
+
+    def clear(self, *_args):
+        pass
