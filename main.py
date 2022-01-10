@@ -57,8 +57,11 @@ def main():
     server = Server(RemiUI, start=False, start_browser=False, port=32841)
     gc.ec.subscribe("quit", lambda *_a, **_kw: quit(all_ports, server))
     server.start()
-    while server._alive:
-        time.sleep(0.5)
+    try:
+        while server._alive:
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        quit(all_ports, server)
 
 
 if __name__ == "__main__":
