@@ -1,4 +1,8 @@
+import logging
+
 from .value import Value
+
+logger = logging.getLogger("Multiplier")
 
 
 class Multiplier(Value):
@@ -19,5 +23,15 @@ class Multiplier(Value):
     def __call__(self):
         irange = self.imax() - self.imin()
         orange = self.omax() - self.omin()
+        logger.debug(f"IRANGE = {irange} ({self.imax()} - {self.imin()})")
+        logger.debug(f"ORANGE = {orange} ({self.omax()} - {self.omin()})")
         multiplier = orange / irange
-        return ((self.value() - self.imin()) * multiplier) + self.omin()
+        multiplied = ((self.value() - self.imin()) * multiplier) + self.omin()
+        logger.debug(
+            f"MULTIPLIER = {multiplier}, VALUE = {self.value()}, MULTIPLIED = {multiplied}"
+        )
+        return multiplied
+
+    def clear(self, *args):
+        for subitem in [self.value, self.imin, self.imax, self.omin, self.omax]:
+            subitem.clear(*args)

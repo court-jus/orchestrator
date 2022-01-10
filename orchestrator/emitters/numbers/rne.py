@@ -1,7 +1,12 @@
+import logging
+import random
+
+import mido
+
 from ...master.controller import global_controller
 from .value import Value
-import random
-import mido
+
+logger = logging.getLogger("RandomNoteEmitter")
 
 
 class RandomNoteEmitter(Value):
@@ -28,7 +33,7 @@ class RandomNoteEmitter(Value):
             if n >= self.get_low_boundary() and n <= self.get_high_boundary()
         ]
         if self.ec.debug:
-            print("RNE range notes", range_notes)
+            logger.debug("Range notes", range_notes)
         if not range_notes:
             # Find the available note that is the closest to the range
             self.current_note = int(
@@ -80,3 +85,12 @@ class RandomNoteEmitter(Value):
 
     def get_high_boundary(self):
         return self.compute_range()[1]
+
+    def clear(self, *args):
+        for subitem in [
+            self.range_center,
+            self.range_size,
+            self.note_duration,
+            self.velocity,
+        ]:
+            subitem.clear(*args)

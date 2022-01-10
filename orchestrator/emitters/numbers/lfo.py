@@ -1,7 +1,10 @@
+import logging
 import math
 
 from ...events.listener import EventListener
 from .value import Value
+
+logger = logging.getLogger("LFO")
 
 
 class LFO(EventListener, Value):
@@ -18,12 +21,19 @@ class LFO(EventListener, Value):
     def __call__(self):
         return self.value
 
-    def tick(self, _evt, step):
+    def tick(self, _event, step):
         value = getattr(LFO, self.shape)(step / self.rate())
         self.value = int((value * (self.max() - self.min()) / 127) + self.min())
         if self.ec.debug:
-            print("LFO value", self.value, step, step / self.rate())
+            logger.debug(
+                f"LFO value: {self.value} (at step {step} => {step / self.rate()})"
+            )
 
     @staticmethod
     def sin(value):
         return (math.sin(value) + 1) * 64
+
+    def clear(self, *args):
+        for subitem in [self.min, self.max, self.rate]:
+            subitem.clear(*args)
+        self.ec.unsubscribe_all(self)

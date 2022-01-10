@@ -19,7 +19,7 @@ class RemiUI(App):
         self.display()
         return self.main_container
 
-    def display(self, evt=None):
+    def display(self, *_args):
         menu = global_controller.menu
         global_controller.main_label.set_text(
             f"{menu.currentmenu['title']} - {menu._uimode}"
@@ -49,3 +49,6 @@ class RemiUI(App):
                     *menuitem.get("args", []),
                     **menuitem.get("kwargs", {}),
                 )
+
+    def clear(self, *_args):
+        global_controller.ec.unsubscribe_all(self)

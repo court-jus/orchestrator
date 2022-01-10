@@ -43,3 +43,7 @@ class Quantizer(Value):
         # Find the available value that is the closest to v
         deltas = sorted([v - n for n in available], key=abs)
         return int(v - deltas[0])
+
+    def clear(self, *args):
+        for subitem in [self.value, self.quantize_to, self.filter_in, self.extend]:
+            subitem.clear(*args)
