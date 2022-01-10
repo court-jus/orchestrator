@@ -56,7 +56,9 @@ def main():
     gc.ec.subscribe("display", menu.display)
     gc.ec.subscribe("control_change", menu.user_action)
 
-    server = Server(RemiUI, start=False, start_browser=False, port=32841, update_interval=0.01)
+    server = Server(
+        RemiUI, start=False, start_browser=False, port=32841, update_interval=0.01
+    )
     gc.ec.subscribe("quit", lambda *_a, **_kw: quit(all_ports, server))
     server.start()
     print("Main loop")
