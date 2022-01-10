@@ -13,5 +13,4 @@ class Track:
     def tick(self, _evt, step):
         if self.gate(step) and not self.mute():
             note = self.notes()
-            # print("g", step, note)
             self.output(note)

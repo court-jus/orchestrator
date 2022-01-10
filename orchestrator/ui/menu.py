@@ -6,8 +6,9 @@ from ..events.listener import EventListener
 
 
 class Menu(EventListener):
-    def __init__(self, ec, scale):
-        self.scale = scale
+    def __init__(self, global_controller):
+        self.scale = global_controller.scale
+        ec = global_controller.ec
         with open("orchestrator/ui/menu.json", "r") as fp:
             self.menu = json.load(fp)
         self.initmenu("$.main")

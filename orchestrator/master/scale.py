@@ -81,6 +81,7 @@ class Scale(EventListener):
         self.current_chord = dict(self.available_chords)[self.chord_name]
         if self.ec:
             self.ec.publish("display")
+        print("NC", self.chord_name)
 
     def on_set_scale(self, _evt, scale_name="ionian - major", root=None):
         self.set_scale(scale_name=scale_name, root=root)
@@ -100,14 +101,8 @@ class Scale(EventListener):
         if msg.control >= 40 and msg.control <= 47 and msg.value == 127:
             chord_idx = msg.control - 40
             self.set_chord(self.available_chords[chord_idx][0])
-        if msg.control == 33:
-            self.change_degree(msg.value)
         if msg.control >= 48 and msg.control <= 55 and msg.value == 127:
             value = msg.control - 48
             degrees = len(self.base_notes)
             self.degree = int(value * degrees / 8)
-
-    def change_degree(self, value):
-        value = min(126, value)
-        degrees = len(self.base_notes)
-        self.degree = int(value * degrees / 127)
+            print("ND", self.degree)

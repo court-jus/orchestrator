@@ -1,6 +1,6 @@
 class Value:
-    def __init__(self, generator):
-        self.generator = generator
+    def __init__(self, value):
+        self.value = value
 
     def __call__(self):
-        return self.generator
+        return self.value

@@ -15,7 +15,7 @@ class Controller:
         self.ec = EventChannel(debug)
         self.clock = Clock(self.ec)
         self.scale = Scale(self)
-        self.menu = Menu(self.ec, self.scale)
+        self.menu = Menu(self)
         self.ec.subscribe("tick", self.tick)
 
     def tick(self, _evt, step):
@@ -26,7 +26,9 @@ class Controller:
     def save(self):
         with open("save.json", "w") as fp:
             json.dump(
-                {name: savable.save() for name, savable in self.savables.items()}, fp
+                {name: savable.save() for name, savable in self.savables.items()},
+                fp,
+                indent=2,
             )
 
 

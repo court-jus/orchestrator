@@ -15,7 +15,6 @@ class MidiControl(EventListener, Value):
         global_controller.savables[self.save_id] = self
 
     def __call__(self):
-        print("use value", self.value)
         return self.value
 
     def save(self):
@@ -24,5 +23,4 @@ class MidiControl(EventListener, Value):
     def control_change(self, _evt, msg):
         if not (msg.channel == self.channel and msg.control == self.control):
             return
-        print("set value to", msg.value)
         self.value = msg.value
