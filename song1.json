@@ -1,0 +1,108 @@
+{
+  "type": "dict",
+  "arp": {
+    "type": "Track",
+    "gate": {
+      "type": "BresenhamEuclideanRythm",
+      "base": {
+        "value": 6
+      },
+      "pulses": {
+        "type": "LFO",
+        "rate": {
+          "value": 150
+        },
+        "min": {
+          "value": 7
+        },
+        "max": {
+          "value": 23
+        }
+      },
+      "length": {
+        "value": 32
+      }
+    },
+    "notes": {
+      "type": "Quantizer",
+      "value": {
+        "type": "RandomValue",
+        "center": {
+          "type": "MidiControl",
+          "channel": 15,
+          "control": 24,
+          "initial": 64
+        },
+        "size": {
+          "type": "Multiplier",
+          "value": {
+            "type": "MidiControl",
+            "channel": 15,
+            "control": 16,
+            "initial": 64
+          },
+          "omin": {
+            "value": 2
+          },
+          "omax": {
+            "value": 40
+          }
+        }
+      },
+      "to": {
+        "type": "ChordsEmitter"
+      },
+      "filter_in": {
+        "value": false
+      },
+      "extend": {
+        "value": true
+      }
+    },
+    "output": {
+      "type": "MidiNotes",
+      "port": "fluid",
+      "channel": 0,
+      "velocity": {
+        "type": "MidiControl",
+        "channel": 15,
+        "control": 32,
+        "initial": 64
+      }
+    },
+    "mute": {
+      "value": false
+    }
+  },
+  "chords": {
+    "type": "Track",
+    "gate": {
+      "type": "BresenhamEuclideanRythm",
+      "base": {
+        "value": 6
+      },
+      "pulses": {
+        "value": 4
+      },
+      "length": {
+        "value": 32
+      }
+    },
+
+    "notes": { "type": "ChordsEmitter" },
+    "output": {
+      "type": "MidiNotes",
+      "port": "fluid",
+      "channel": 1,
+      "velocity": {
+        "type": "MidiControl",
+        "channel": 15,
+        "control": 33,
+        "initial": 32
+      },
+      "duration": {
+        "value": 100
+      }
+    }
+  }
+}
