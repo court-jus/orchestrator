@@ -65,6 +65,7 @@ def recursively_load(data, **global_kwargs):
     item_args = [global_kwargs[arg_name] for arg_name in item_type.get("args", [])]
     item_kwargs = {}
     result = None
+    opened_ports = set()
     for k, v in data.items():
         # print("for", item_type, "get", k, "from", v)
         if not isinstance(v, dict):

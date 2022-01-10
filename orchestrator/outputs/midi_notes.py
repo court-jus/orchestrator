@@ -6,7 +6,7 @@ from ..tools.midi import get_port
 
 class MidiNotes:
     def __init__(self, port, channel, duration=Value(3), velocity=Value(60)):
-        self.port = get_port(port) if isinstance(port, str) else port
+        self.opened_port = get_port(port) if isinstance(port, str) else port
         self.channel = channel
         self.msg_buffer = {}  # Note -> (stopat, msg_off)
         self.duration = duration
@@ -51,7 +51,7 @@ class MidiNotes:
             msg_dict["type"] = "note_off"
             self.msg_buffer[msg.note] = (stopat, mido.Message.from_dict(msg_dict))
 
-        if self.port:
+        if self.opened_port:
             msg.channel = self.channel
             if global_controller.ec.debug:
                 print(msg)
