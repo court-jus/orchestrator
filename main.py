@@ -5,20 +5,21 @@ from remi import Server
 
 from orchestrator.master import global_controller
 from orchestrator.song import loadsong
-from orchestrator.tools.midi import get_port
+from orchestrator.tools.midi import get_port, open_all_inputs
 from orchestrator.ui.menu import Menu
 from orchestrator.ui.remiui import RemiUI
 
 
-def quit(ports, server):
-    print("QUIT!!")
+def quit(closables, server):
+    print("QUIT!!, Stop server")
     server.stop()
+    print("QUIT!!, Server stopped, close midi ports")
     global_controller.save()
-    for port in ports:
-        if port:
-            print("Closing port", port)
-            port.close()
-            print("Port", port, "closed")
+    for closable in closables:
+        if closable and hasattr(closable, "close"):
+            print("Closing", closable)
+            closable.close()
+            print(closable, "closed")
     sys.exit(0)
 
 
@@ -34,15 +35,16 @@ def main():
     gc = global_controller
 
     # MIDI Ports
-    midikbd = get_port(
-        "digital piano", direction="input", callback=filter_clock(gc.ec.publish)
-    )
-    midictrl = get_port("launch control", direction="input", callback=gc.ec.publish)
-    clockport = get_port("midiclock", direction="input", callback=gc.ec.publish)
-    all_ports = [midikbd, midictrl, clockport]
+    # midikbd = get_port(
+    #     "iRig", direction="input", callback=filter_clock(gc.ec.publish)
+    # )
+    # midictrl = get_port("launch control", direction="input", callback=gc.ec.publish)
+    # clockport = get_port("midiclock", direction="input", callback=gc.ec.publish)
+    # all_ports = [midikbd, midictrl, clockport]
+    all_ports = open_all_inputs(gc.ec)
 
-    opened_ports = loadsong("song1.json", global_controller)
-    all_ports.extend(opened_ports)
+    song, closables = loadsong("song2.json", global_controller)
+    all_ports.extend(closables)
 
     # with a clock at 120bpm and 120ticks per quarter
     # 6 at 4/16 = 120bpm
@@ -54,11 +56,12 @@ def main():
     gc.ec.subscribe("display", menu.display)
     gc.ec.subscribe("control_change", menu.user_action)
 
-    server = Server(RemiUI, start=False, start_browser=False, port=32841)
+    server = Server(RemiUI, start=False, start_browser=False, port=32841, update_interval=0.01)
     gc.ec.subscribe("quit", lambda *_a, **_kw: quit(all_ports, server))
     server.start()
+    print("Main loop")
     while server._alive:
-        time.sleep(0.5)
+        time.sleep(0.01)
 
 
 if __name__ == "__main__":

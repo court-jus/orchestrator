@@ -60,6 +60,7 @@ def loadsong(filename, ctrl):
 def recursively_load(data, **global_kwargs):
     item_type = MODULES[data.pop("type", "Value")]
     item_class = item_type["class"]
+    closable = []
     # print("\n=====\nLOAD", item_class, "from\n-----", data)
     item_args = [global_kwargs[arg_name] for arg_name in item_type.get("args", [])]
     item_kwargs = {}
@@ -69,8 +70,11 @@ def recursively_load(data, **global_kwargs):
         if not isinstance(v, dict):
             item_kwargs[k] = v
             continue
-        item_kwargs[k] = recursively_load(v, **global_kwargs)
+        item_kwargs[k], child_closable = recursively_load(v, **global_kwargs)
+        closable.extend(child_closable)
         # print("spawn class", item_class, "with args", item_args, "kwargs", item_kwargs)
     result = item_class(*item_args, **item_kwargs)
+    if hasattr(result, "close"):
+        closable.append(result)
     # print("-----\nresult\n-----", result, "\n=====")
-    return result
+    return result, closable

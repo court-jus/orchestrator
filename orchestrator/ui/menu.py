@@ -3,6 +3,7 @@ import json
 from jsonpath_ng import parse
 
 from ..events.listener import EventListener
+from ..tools.midi import list_inputs
 
 
 class Menu(EventListener):
@@ -41,7 +42,7 @@ class Menu(EventListener):
             for item in menuitems:
                 self.actions.append(item)
 
-    def display(self, _event=None, _msg=None):
+    def display(self, _event=None, _msg=None, *_a, **_kw):
         print(f"{self.currentmenu['title']} - {self._uimode}")
         print(
             f"{self.scale.root} - {self.scale.scale_name} - {self.scale.chord_name} - {self.scale.degree + 1}"
@@ -51,7 +52,7 @@ class Menu(EventListener):
                 f"{'>' if self.currentselection == idx else ' '}  {idx + 1}. {item['title']}"
             )
 
-    def user_action(self, event, msg):
+    def user_action(self, event, msg, *_a, **_kw):
         if msg.channel != 15:  # Channels are 0 indexed
             return
         if msg.control == 0 and msg.value == 127:
@@ -111,9 +112,32 @@ class Menu(EventListener):
             }
             for chordname, _ in self.scale.available_chords
         ]
-
-    def tick(self, _event, step):
+    
+    def midiclocks(self):
+        return [
+            {
+                "id": deviceid,
+                "title": devicename,
+                "action": "set_clock",
+                "args": [deviceid],
+            }
+            for deviceid, devicename in list_inputs()
+        ]
+    
+    def midinote(self):
+        return [
+            {
+                "id": deviceid,
+                "title": devicename,
+                "action": "set_noteinput",
+                "args": [deviceid],
+            }
+            for deviceid, devicename in list_inputs()
+        ]
+    
+    def tick(self, _event, step, *_a, **_kw):
         # For debug purpose
+        return
         if step % 20 != 0:
             return
         step = int(step / 20)

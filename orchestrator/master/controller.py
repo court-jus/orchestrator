@@ -18,7 +18,7 @@ class Controller:
         self.menu = Menu(self)
         self.ec.subscribe("tick", self.tick)
 
-    def tick(self, _evt, step):
+    def tick(self, _evt, step, *_a, **_kw):
         if step % 100 == 0:
             print("save")
             self.save()

@@ -20,7 +20,7 @@ class MidiControl(EventListener, Value):
     def save(self):
         return self.value
 
-    def control_change(self, _evt, msg):
+    def control_change(self, _evt, msg, *_a, **_kw):
         if not (msg.channel == self.channel and msg.control == self.control):
             return
         self.value = msg.value

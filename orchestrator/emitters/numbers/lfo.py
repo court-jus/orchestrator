@@ -18,7 +18,7 @@ class LFO(EventListener, Value):
     def __call__(self):
         return self.value
 
-    def tick(self, _evt, step):
+    def tick(self, _evt, step, *_a, **_kw):
         value = getattr(LFO, self.shape)(step / self.rate())
         self.value = int((value * (self.max() - self.min()) / 127) + self.min())
         if self.ec.debug:

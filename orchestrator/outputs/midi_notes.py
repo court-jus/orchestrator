@@ -13,12 +13,14 @@ class MidiNotes:
         self.velocity = velocity
         global_controller.ec.subscribe("tick", self.tick)
 
-    def tick(self, event, step):
+    def tick(self, event, step, *_a, **_kw):
         stopped = []
         for note, (stopat, msg_off) in self.msg_buffer.items():
             if stopat == step:
-                print(msg_off)
-                self.port.send(msg_off)
+                if self.port:
+                    if global_controller.ec.debug:
+                        print(msg_off)
+                    self.port.send(msg_off)
                 stopped.append(note)
         for n in stopped:
             self.msg_buffer.pop(n)
@@ -40,8 +42,7 @@ class MidiNotes:
         if msg.type == "note_on":
             # Stop note if already playing
             msg_off = self.msg_buffer.pop(msg.note, None)
-            if msg_off:
-                print(msg_off[1])
+            if msg_off and self.port:
                 self.port.send(msg_off[1])
 
             # Play and store off message
@@ -52,5 +53,10 @@ class MidiNotes:
 
         if self.port:
             msg.channel = self.channel
-            print(msg)
+            if global_controller.ec.debug:
+                print(msg)
             self.port.send(msg)
+
+    def close(self):
+        if self.port:
+            self.port.close()

@@ -7,7 +7,7 @@ class RemiUI(App):
     def __init__(self, *args):
         global_controller.ec.subscribe("display", self.display)
         super().__init__(*args)
-
+    
     def main(self):
         self.main_container = gui.VBox(width=320, height=240)
         global_controller.main_label = gui.Label()
@@ -18,8 +18,18 @@ class RemiUI(App):
         self.main_container.append(global_controller.menu_container, key="menu")
         self.display()
         return self.main_container
+    
+    def do_gui_update(self):
+        menu = global_controller.menu
+        global_controller.main_label.set_text(
+            f"{menu.currentmenu['title']} - {menu._uimode}"
+        )
+        global_controller.sub_label.set_text(
+            f"{menu.scale.root} - {menu.scale.scale_name} - {menu.scale.chord_name} - {menu.scale.degree + 1}"
+        )
+        return super().do_gui_update()
 
-    def display(self, evt=None):
+    def display(self, evt=None, *_a, **_kw):
         menu = global_controller.menu
         global_controller.main_label.set_text(
             f"{menu.currentmenu['title']} - {menu._uimode}"
@@ -41,7 +51,6 @@ class RemiUI(App):
         menuitem = menu.actions[idx]
         if menuitem["action"] == "menu":
             menu.initmenu(menuitem["args"][0])
-            self.display()
         else:
             if menu.ec:
                 menu.ec.publish(
@@ -49,3 +58,4 @@ class RemiUI(App):
                     *menuitem.get("args", []),
                     **menuitem.get("kwargs", {}),
                 )
+        self.display()

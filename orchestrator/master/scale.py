@@ -4,6 +4,7 @@ from ..events.listener import EventListener
 
 class Scale(EventListener):
     def __init__(self, global_controller):
+        self.inputdevice = None
         self.available_notes = []
         self.current_chord = []
         self.root = None
@@ -28,6 +29,7 @@ class Scale(EventListener):
         super().__init__(global_controller.ec)
         if self.ec:
             self.set_event_channel(self.ec)
+
         self.set_scale(self.scale_name, self.root)
         self.set_chord(self.chord_name)
         global_controller.savables[self.save_id] = self
@@ -45,6 +47,10 @@ class Scale(EventListener):
         self.ec.subscribe("control_change", self.control_change)
         self.ec.subscribe("set_scale", self.on_set_scale)
         self.ec.subscribe("set_chord", self.on_set_chord)
+        self.ec.subscribe("set_noteinput", self.set_noteinputdevice)
+
+    def set_noteinputdevice(self, _event, msg, *a, **kw):
+        self.inputdevice = msg
 
     def transpose(self, root):
         oldroot = self.root
@@ -81,21 +87,20 @@ class Scale(EventListener):
         self.current_chord = dict(self.available_chords)[self.chord_name]
         if self.ec:
             self.ec.publish("display")
-        print("NC", self.chord_name)
 
-    def on_set_scale(self, _evt, scale_name="ionian - major", root=None):
+    def on_set_scale(self, _evt, scale_name="ionian - major", root=None, *_a, **_kw):
         self.set_scale(scale_name=scale_name, root=root)
 
-    def on_set_chord(self, _evt, chord_name="triad"):
+    def on_set_chord(self, _evt, chord_name="triad", *_a, **_kw):
         self.set_chord(chord_name=chord_name)
 
-    def noteon(self, event, msg):
-        if self._uimode == "transpose":
+    def noteon(self, _event, msg, *_a, **kw):
+        if self._uimode == "transpose" and kw.get("midi_port_name") == self.inputdevice:
             self.transpose(msg.note)
             if self.ec:
                 self.ec.publish("uimode", None)
 
-    def control_change(self, event, msg):
+    def control_change(self, _event, msg, *_a, **_kw):
         if msg.channel != 15:
             return
         if msg.control >= 40 and msg.control <= 47 and msg.value == 127:

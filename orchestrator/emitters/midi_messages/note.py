@@ -9,7 +9,7 @@ class NoteEmitter(EventListener):
         if self.ec:
             ec.subscribe("tick", self.tick)
 
-    def tick(self, event, step):
+    def tick(self, event, step, *_a, **_kw):
         if self.current_notes and step in self.current_notes.values():
             for note, stopat in self.current_notes.items():
                 if stopat == step:

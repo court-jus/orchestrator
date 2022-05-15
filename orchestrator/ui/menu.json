@@ -24,8 +24,50 @@
                 "title": "Set chord",
                 "action": "menu",
                 "args": ["$.chordtype"]
+            },
+            {
+                "id": "settings",
+                "title": "Settings",
+                "action": "menu",
+                "args": ["$.settings"]
             }
         ]
+    },
+    "settings": {
+        "title": "Settings",
+        "items": [
+            {
+                "id": "midi",
+                "title": "MIDI",
+                "action": "menu",
+                "args": ["$.midisettings"]
+            }
+        ]
+    },
+    "midisettings": {
+        "title": "MIDI Settings",
+        "items": [
+            {
+                "id": "choosemidiclock",
+                "title": "Choose clock device",
+                "action": "menu",
+                "args": ["$.choosemidiclock"]
+            },
+            {
+                "id": "choosemidinote",
+                "title": "Choose note input device",
+                "action": "menu",
+                "args": ["$.choosemidinote"]
+            }
+        ]
+    },
+    "choosemidiclock": {
+        "title": "Choose MIDI Clock",
+        "items": "midiclocks"
+    },
+    "choosemidinote": {
+        "title": "Choose MIDI Note input device",
+        "items": "midinote"
     },
     "scaletype": {
         "title": "Choose scale",

@@ -7,7 +7,7 @@ class EventListener:
         if self.ec:
             self.ec.subscribe("uimode", self.uimode)
 
-    def uimode(self, _event, newmode):
+    def uimode(self, _event, newmode, *_a, **_kw):
         self._uimode = newmode
         if hasattr(self, "display"):
             getattr(self, "display")()

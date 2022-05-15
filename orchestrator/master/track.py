@@ -10,7 +10,7 @@ class Track:
         self.mute = mute
         global_controller.ec.subscribe("tick", self.tick)
 
-    def tick(self, _evt, step):
+    def tick(self, _evt, step, *_a, **_kw):
         if self.gate(step) and not self.mute():
             note = self.notes()
             self.output(note)
