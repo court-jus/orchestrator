@@ -23,13 +23,14 @@ class Scale(EventListener):
         self.scale_name = "gypsy min"
         self.chord_name = "7"
         self.root = 60
+        self.degree = 0
         # Saved values
         if self.save_id in global_controller.loaded:
             saved = global_controller.loaded[self.save_id]
             self.scale_name = saved["scale"]
             self.chord_name = saved["chord"]
+            self.degree = saved["degree"]
             self.root = saved["root"]
-        self.degree = 0
         super().__init__(global_controller.ec)
         if self.ec:
             self.set_event_channel(self.ec)
@@ -42,6 +43,7 @@ class Scale(EventListener):
         return {
             "scale": self.scale_name,
             "chord": self.chord_name,
+            "degree": self.degree,
             "root": self.root,
         }
 
@@ -52,6 +54,7 @@ class Scale(EventListener):
         self.ec.subscribe("set_scale", self.on_set_scale)
         self.ec.subscribe("set_chord", self.on_set_chord)
         self.ec.subscribe("set_noteinput", self.set_noteinputdevice)
+        self.ec.subscribe("set_degree", self.on_set_degree)
 
     def set_noteinputdevice(self, _event, msg, *a, **kw):
         self.inputdevice = msg
@@ -83,15 +86,19 @@ class Scale(EventListener):
                 n - 12 for n in self.available_notes[: (len(self.base_notes) - 1)]
             ] + self.available_notes
         self.available_notes = [n for n in self.available_notes if n >= 0 and n <= 127]
-        if self.ec:
-            self.ec.publish("display")
+        self.ec.publish("display")
+        logger.debug(f"New scale {self.scale_name}")
 
     def set_chord(self, chord_name="triad"):
         self.chord_name = chord_name
         self.current_chord = dict(self.available_chords)[self.chord_name]
-        if self.ec:
-            self.ec.publish("display")
-        logger.debug("New chord", self.chord_name)
+        self.ec.publish("display")
+        logger.debug(f"New chord {self.chord_name}")
+
+    def set_degree(self, degree=0):
+        self.degree = degree
+        self.ec.publish("display")
+        logger.info(f"New chord degree {self.degree}")
 
     def on_set_scale(self, _evt, scale_name="ionian - major", root=None, *_a, **_kw):
         self.set_scale(scale_name=scale_name, root=root)
@@ -99,11 +106,14 @@ class Scale(EventListener):
     def on_set_chord(self, _evt, chord_name="triad", *_a, **_kw):
         self.set_chord(chord_name=chord_name)
 
+    def on_set_degree(self, _event, degree=0):
+        self.set_degree(degree=degree)
+
     def noteon(self, _event, msg, *_a, **kw):
         if self._uimode == "transpose" and kw.get("midi_port_name") == self.inputdevice:
             self.transpose(msg.note)
-            if self.ec:
-                self.ec.publish("uimode", None)
+            self.ec.publish("display")
+            self.ec.publish("uimode", None)
 
     def control_change(self, _event, msg, *_a, **_kw):
         if msg.channel != 15:
@@ -114,5 +124,4 @@ class Scale(EventListener):
         if msg.control >= 48 and msg.control <= 55 and msg.value == 127:
             value = msg.control - 48
             degrees = len(self.base_notes)
-            self.degree = int(value * degrees / 8)
-            logger.debug("New chord degree", self.degree)
+            self.set_degree(int(value * degrees / 8))

@@ -4,15 +4,18 @@ import logging
 
 from remi import Server
 
-from orchestrator.master import global_controller
+from orchestrator.master.controller import global_controller
 from orchestrator.song import loadsong
 from orchestrator.tools.midi import get_port, open_all_inputs
 from orchestrator.ui.menu import Menu
 from orchestrator.ui.remiui import RemiUI
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
+logger.setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def quit(closables, server):
@@ -54,9 +57,15 @@ def main():
     gc.ec.subscribe("control_change", menu.user_action)
 
     server = Server(
-        RemiUI, start=False, start_browser=False, port=32841, update_interval=0.01
+        RemiUI,
+        start=False,
+        start_browser=False,
+        address="0.0.0.0",
+        port=32841,
+        update_interval=0.01,
     )
     gc.ec.subscribe("quit", lambda *_a, **_kw: quit(all_ports, server))
+    gc.postinit()
     server.start()
     print("Main loop")
     while server._alive:

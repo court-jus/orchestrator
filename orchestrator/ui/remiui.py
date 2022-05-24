@@ -1,6 +1,6 @@
 from remi import App, gui
 
-from ..master import global_controller
+from ..master.controller import global_controller
 
 
 class RemiUI(App):

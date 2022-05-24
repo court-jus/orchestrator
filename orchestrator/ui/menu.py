@@ -24,7 +24,6 @@ class Menu(EventListener):
         self.initmenu("$.main")
         super().__init__(ec)
         self.ec.subscribe("choose_port", self.choose_port)
-        self.ec.subscribe("loadsong", self.loadsong)
 
     def initmenu(self, menupath):
         self.currentmenupath = menupath
@@ -102,7 +101,7 @@ class Menu(EventListener):
                 self.ec.publish("quit")
 
     def scaletype(self):
-        return [
+        return [{"title": "Back", "action": "menu", "args": ["$.perform"],},] + [
             {
                 "title": scalename,
                 "action": "set_scale",
@@ -112,7 +111,7 @@ class Menu(EventListener):
         ]
 
     def chordtype(self):
-        return [
+        return [{"title": "Back", "action": "menu", "args": ["$.perform"],},] + [
             {
                 "title": chordname,
                 "action": "set_chord",
@@ -143,8 +142,18 @@ class Menu(EventListener):
             for deviceid, devicename in list_inputs()
         ]
 
+    def choosedegree(self):
+        return [{"title": "Back", "action": "menu", "args": ["$.perform"],},] + [
+            {
+                "title": idx + 1,
+                "action": "set_degree",
+                "args": [idx],
+            }
+            for idx in range(len(self.scale.base_notes))
+        ]
+
     def listsongs_to_load(self):
-        return [
+        return [{"title": "Back", "action": "menu", "args": ["$.song"],},] + [
             {
                 "title": filename,
                 "action": "loadsong",
@@ -152,14 +161,6 @@ class Menu(EventListener):
             }
             for filename in os.listdir("songs")
         ]
-
-    def loadsong(self, _event, filename):
-        from ..song import loadsong
-
-        print("LOAD SONG", filename)
-        opened_ports, song = loadsong(os.path.join("songs", filename), self.gc)
-        self.gc.opened_ports.extend(opened_ports)
-        logger.debug("Song loaded: {song}")
 
     def choose_port(self, _event, action, direction, filtered_events, portname=None):
         logger.debug(f"{action} for {direction} (args: {filtered_events}, {portname})")
@@ -189,7 +190,14 @@ class Menu(EventListener):
             port_getter = mido.open_output if direction == "output" else mido.open_input
             kwargs = {"callback": filter_events(self.gc.ec.publish, filtered_events)}
             kwargs.update({"autoreset": True} if direction == "output" else {})
-            self.gc.opened_ports.append(port_getter(portname, **kwargs))
+            self.gc.opened_ports.append(
+                {
+                    "direction": direction,
+                    "filtered_events": filtered_events,
+                    "portname": portname,
+                    "instance": port_getter(portname, **kwargs),
+                }
+            )
 
     def tick(self, _event, step, *_a, **_kw):
         # For debug purpose
