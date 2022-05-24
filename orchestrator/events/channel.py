@@ -1,4 +1,3 @@
-import pprint
 import logging
 
 import mido
@@ -42,7 +41,6 @@ class EventChannel:
 
         if callback not in self.subscribers[event]:
             self.subscribers[event].append(callback)
-        pprint.pprint(self.subscribers)
 
     def publish(self, event, *args, **kwargs):
         if isinstance(event, mido.Message):

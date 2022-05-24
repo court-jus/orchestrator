@@ -4,7 +4,6 @@ from ..emitters import Value
 
 class Track(EventListener):
     def __init__(self, ec, gate, notes, output, mute=Value(False)):
-        print("Track created", id(ec), gate, notes, output, mute)
         self.gate = gate
         self.notes = notes
         self.output = output
@@ -15,7 +14,6 @@ class Track(EventListener):
         self.ec.subscribe("close", self.clear)
 
     def tick(self, _event, step):
-        print(step, self.gate(step), self.mute())
         if self.gate(step) and not self.mute():
             note = self.notes()
             self.output(note)

@@ -1,0 +1,34 @@
+{
+  "type": "dict",
+  "chords": {
+    "type": "Track",
+    "gate": {
+      "type": "BresenhamEuclideanRythm",
+      "base": {
+        "value": 6
+      },
+      "pulses": {
+        "value": 4
+      },
+      "length": {
+        "value": 32
+      }
+    },
+
+    "notes": { "type": "ChordsEmitter" },
+    "output": {
+      "type": "MidiNotes",
+      "port": "fluid",
+      "channel": 1,
+      "velocity": {
+        "type": "MidiControl",
+        "channel": 15,
+        "control": 33,
+        "initial": 32
+      },
+      "duration": {
+        "value": 100
+      }
+    }
+  }
+}

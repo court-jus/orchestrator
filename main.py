@@ -8,8 +8,11 @@ from orchestrator.master import global_controller
 from orchestrator.ui.remiui import RemiUI
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("main")
+logger.setLevel(logging.INFO)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 
 def quit(server):
@@ -22,18 +25,6 @@ def quit(server):
 
 def main():
     gc = global_controller
-
-    # MIDI Ports
-    # gc.opened_ports.append(
-    #     get_port("keyboard", direction="input", callback=filter_clock(gc.ec.publish))
-    # )
-    # gc.opened_ports.append(
-    #     get_port("launch control", direction="input", callback=gc.ec.publish)
-    # )
-    # gc.opened_ports.append(
-    #     get_port("midiclock", direction="input", callback=gc.ec.publish)
-    # )
-
     # with a clock at 120bpm and 120ticks per quarter
     # 6 at 4/16 = 120bpm
 
@@ -44,8 +35,9 @@ def main():
     gc.ec.subscribe("display", menu.display)
     gc.ec.subscribe("control_change", menu.user_action)
 
-    server = Server(RemiUI, start=False, start_browser=False, port=32841)
+    server = Server(RemiUI, start=False, start_browser=False, address="0.0.0.0", port=32841)
     gc.ec.subscribe("quit", lambda *_a, **_kw: quit(server))
+    gc.postinit()
     server.start()
     try:
         while server._alive:

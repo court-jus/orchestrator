@@ -8,8 +8,7 @@ class EventListener:
 
     def uimode(self, _event, newmode):
         self._uimode = newmode
-        if hasattr(self, "display"):
-            getattr(self, "display")()
+        self.ec.subscribe("display")
 
     def set_event_channel(self, ec):
         self.ec.unsubscribe_all(self)

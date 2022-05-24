@@ -37,6 +37,11 @@
         "title": "Midi Settings",
         "items": [
             {
+                "title": "Back",
+                "action": "menu",
+                "args": ["$.settings"]
+            },
+            {
                 "title": "Close all ports",
                 "action": "close"
             },
@@ -74,6 +79,11 @@
                 "title": "Set chord",
                 "action": "menu",
                 "args": ["$.chordtype"]
+            },
+            {
+                "title": "Choose degree",
+                "action": "menu",
+                "args": ["$.choosedegree"]
             }
         ]
     },
@@ -102,6 +112,10 @@
     "chordtype": {
         "title": "Choose chord",
         "items": "chordtype"
+    },
+    "choosedegree": {
+        "title": "Choose degree",
+        "items": "choosedegree"
     },
     "loadsong": {
         "title": "Choose song to load",
